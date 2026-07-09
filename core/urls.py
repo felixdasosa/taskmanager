@@ -42,6 +42,7 @@ urlpatterns = [
     path('reminders/sterge/<int:reminder_id>/', views.sterge_reminder, name='sterge_reminder'),
     path('task/<int:task_id>/adauga-raport/', views.adauga_raport_supervizor, name='adauga_raport_supervizor'),
     path('raport/sterge/<int:raport_id>/', views.sterge_raport, name='sterge_raport'),
-    path('manifest.json', TemplateView.as_view(template_name='manifest.json', content_type='application/json'), name='manifest'),
-path('sw.js', TemplateView.as_view(template_name='sw.js', content_type='application/javascript'), name='sw'),
+    path('manifest.json', TemplateView.as_view(template_name='core/manifest.json', content_type='application/json'), name='manifest'),
+    path('sw.js', TemplateView.as_view(template_name='core/sw.js', content_type='application/javascript'), name='sw'),
+path('task/<int:task_id>/gps_silent/', views.actualizeaza_gps_silent, name='actualizeaza_gps_silent'),
 ]

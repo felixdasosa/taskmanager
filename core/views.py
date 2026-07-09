@@ -1,5 +1,10 @@
 from multiprocessing import context
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Task
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -106,10 +111,11 @@ def dashboard(request):
 
 @login_required(login_url='login')
 def lista_taskuri(request):
+    # Am adăugat 'rapoarte_control' în prefetch_related pentru ambele tipuri de utilizatori
     if request.user.role in ['superadmin', 'manager']:
-        toate_taskurile = Task.objects.all().order_by('-data_crearii').prefetch_related('atribuit_catre')
+        toate_taskurile = Task.objects.all().order_by('-data_crearii').prefetch_related('atribuit_catre', 'rapoarte_control')
     else:
-        toate_taskurile = Task.objects.filter(atribuit_catre=request.user).order_by('-data_crearii').prefetch_related('atribuit_catre')
+        toate_taskurile = Task.objects.filter(atribuit_catre=request.user).order_by('-data_crearii').prefetch_related('atribuit_catre', 'rapoarte_control')
         
     query = request.GET.get('q', '')
     if query:
@@ -123,7 +129,6 @@ def lista_taskuri(request):
         'taskuri_finalizate': taskuri_finalizate,
         'query': query
     })
-
 
 @login_required(login_url='login')
 def creeaza_task(request):
@@ -503,9 +508,10 @@ def export_raport_excel(request):
     ws = wb.active
     ws.title = "Istoric Taskuri"
     
+    # Am șters 'Raport Angajat' din headers
     headers = [
         'Titlu Task', 'Locație', 'Acțiuni Necesare', 'Responsabili', 
-        'Data Începerii', 'Data Finalizării', 'Durată Lucru', 'Status Timp', 'Raport Angajat'
+        'Data Începerii', 'Data Finalizării', 'Durată Lucru', 'Status Timp'
     ]
     ws.append(headers)
     
@@ -526,6 +532,7 @@ def export_raport_excel(request):
             if task.data_finalizarii > task.deadline:
                 status_timp = "Întârziat"
         
+        # Am șters raportul și de aici
         ws.append([
             task.titlu,
             task.locatie,
@@ -534,8 +541,7 @@ def export_raport_excel(request):
             task.data_inceperii.strftime('%d-%m-%Y %H:%M') if task.data_inceperii else '-',
             task.data_finalizarii.strftime('%d-%m-%Y %H:%M') if task.data_finalizarii else '-',
             f"{durata_min} min",
-            status_timp,
-            task.raport_finalizare or ""
+            status_timp
         ])
     
     for col in ws.columns:
@@ -560,13 +566,13 @@ def export_raport_excel(request):
         
         ws.column_dimensions[col_letter].width = adjusted_width
         
-    # Înregistrăm acțiunea în Audit chiar înainte de return
     salveaza_log(request, f"📥 A descărcat un raport Excel (Filtre: Locație={locatie or 'Toate'}, Angajat={nume_angajat or 'Toți'})")
 
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="{nume_fisier}.xlsx"'
     wb.save(response)
     return response
+    
 
 
 @login_required(login_url='login')
@@ -678,3 +684,22 @@ def sterge_raport(request, raport_id):
         
     # Ne întoarcem pe pagina de unde am dat click (lista de taskuri)
     return redirect(request.META.get('HTTP_REFERER', 'lista_taskuri'))
+
+
+
+# 2. FUNCȚIA PENTRU VÂNĂTORUL TĂCUT DE PE TELEFOANELE BĂIEȚILOR
+@login_required(login_url='login')
+def actualizeaza_gps_silent(request, task_id):
+    if request.method == 'POST':
+        task = get_object_or_404(Task, id=task_id)
+        
+        if not task.latitudine_inceput:
+            lat = request.POST.get('lat')
+            lng = request.POST.get('lng')
+            if lat and lng:
+                task.latitudine_inceput = lat
+                task.longitudine_inceput = lng
+                task.save()
+                return JsonResponse({'status': 'success', 'message': 'Locație recuperată cu succes!'})
+                
+    return JsonResponse({'status': 'error', 'message': 'Eroare preluare.'}, status=400)

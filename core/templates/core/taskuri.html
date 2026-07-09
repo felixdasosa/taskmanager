@@ -20,6 +20,8 @@
         .nav-link:hover { background-color: #e9ecef; color: #212529; border-radius: 5px; }
         .logout-btn { color: #dc3545; }
         .logout-btn:hover { background-color: #ffe6e6; color: #dc3545; }
+        /* Optimizare PWA pt ecrane tactile */
+        a, button, .btn { touch-action: manipulation; }
     </style>
 </head>
 <body>
@@ -43,7 +45,7 @@
         <h5 class="text-center mb-4 mt-3 font-weight-bold text-secondary d-none d-md-block">Panou Control</h5>
         <ul class="nav flex-column w-100 p-3 p-md-0">
             <li class="nav-item mb-1"><a class="nav-link" href="{% url 'dashboard' %}">🏠 Dashboard</a></li>
-            <li class="nav-item mb-1"><a class="nav-link" href="{% url 'lista_taskuri' %}">📋 Taskuri</a></li>
+            <li class="nav-item mb-1"><a class="nav-link fw-bold text-primary" href="{% url 'lista_taskuri' %}">📋 Taskuri</a></li>
             
             {% if request.user.role == 'superadmin' or request.user.role == 'manager' %}
                 <li class="nav-item mb-1"><a class="nav-link" href="{% url 'istoric_taskuri' %}">📊 Istoric & Rapoarte</a></li>
@@ -82,7 +84,7 @@
                     {% for task in taskuri_active %}
                         <li class="list-group-item py-3">
                             <div class="d-flex justify-content-between align-items-start w-100">
-                                <div class="pe-2">
+                                <div class="pe-2 w-100">
                                     <strong class="d-block text-dark h5 mb-2">{{ task.titlu }}</strong>
                                     {% if task.descriere %}
                                         <p class="text-secondary small mb-1"><strong>📝 Descriere:</strong> {{ task.descriere }}</p>
@@ -98,8 +100,21 @@
                                             {% empty %} Fără responsabil alocat {% endfor %}
                                         </b></small>
                                         <small class="text-muted">Termen: {{ task.deadline|date:"d M Y, H:i" }}</small>
+                                        
+                                        {% if request.user.role == 'superadmin' or request.user.role == 'manager' %}
+                                            <div class="mt-2 p-2 border border-secondary rounded bg-light" style="max-width: fit-content;">
+                                                <small class="fw-bold text-dark d-block mb-1">📡 Status GPS Telefon:</small>
+                                                {% if task.latitudine_inceput %}
+                                                    <span class="badge bg-success shadow-sm">📍 Locație Preluată</span>
+                                                    <a href="{{ task.link_google_maps }}" target="_blank" class="btn btn-sm btn-outline-success ms-2 py-0" style="font-size: 11px;">🗺️ Vezi pe Hartă</a>
+                                                {% else %}
+                                                    <span class="badge bg-danger shadow-sm">❌ În așteptare semnal</span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+
                                         <div class="mt-2">
-                                            {% if task.status != 'in_asteptare' and task.latitudine_inceput %}
+                                            {% if task.status != 'in_asteptare' and task.latitudine_inceput and request.user.role != 'superadmin' and request.user.role != 'manager' %}
                                                 <a href="{{ task.link_google_maps }}" target="_blank" class="btn btn-sm btn-outline-success" style="font-size: 12px; padding: 2px 8px;">📍 Vezi locația</a>
                                             {% endif %}
                                         </div>
@@ -108,22 +123,22 @@
                                 
                                 <div class="text-end" style="min-width: 140px;">
                                     {% if task.este_intarziat %}
-    {% if task.status == 'in_lucru' %}
-        <span class="badge bg-danger text-white p-2 rounded mb-2 d-inline-block w-100">⚠️ În lucru - Întârziat</span>
-    {% elif task.status == 'in_pauza' %}
-        <span class="badge bg-danger text-white p-2 rounded mb-2 d-inline-block w-100">⚠️ În pauză - Întârziat</span>
-    {% else %}
-        <span class="badge bg-danger text-white p-2 rounded mb-2 d-inline-block w-100">⚠️ În așteptare - Întârziat</span>
-    {% endif %}
-{% else %}
-    {% if task.status == 'in_asteptare' %} 
-        <span class="badge bg-secondary text-white p-2 rounded mb-2 d-inline-block w-100">În așteptare</span>
-    {% elif task.status == 'in_lucru' %} 
-        <span class="badge bg-primary text-white p-2 rounded mb-2 d-inline-block w-100">În lucru</span>
-    {% elif task.status == 'in_pauza' %} 
-        <span class="badge bg-secondary text-white p-2 rounded mb-2 d-inline-block w-100">⏸ În pauză</span>
-    {% endif %}
-{% endif %}
+                                        {% if task.status == 'in_lucru' %}
+                                            <span class="badge bg-danger text-white p-2 rounded mb-2 d-inline-block w-100">⚠️ În lucru - Întârziat</span>
+                                        {% elif task.status == 'in_pauza' %}
+                                            <span class="badge bg-danger text-white p-2 rounded mb-2 d-inline-block w-100">⚠️ În pauză - Întârziat</span>
+                                        {% else %}
+                                            <span class="badge bg-danger text-white p-2 rounded mb-2 d-inline-block w-100">⚠️ În așteptare - Întârziat</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if task.status == 'in_asteptare' %} 
+                                            <span class="badge bg-secondary text-white p-2 rounded mb-2 d-inline-block w-100">În așteptare</span>
+                                        {% elif task.status == 'in_lucru' %} 
+                                            <span class="badge bg-primary text-white p-2 rounded mb-2 d-inline-block w-100">În lucru</span>
+                                        {% elif task.status == 'in_pauza' %} 
+                                            <span class="badge bg-secondary text-white p-2 rounded mb-2 d-inline-block w-100">⏸ În pauză</span>
+                                        {% endif %}
+                                    {% endif %}
                                     
                                     {% if request.user.role == 'superadmin' or request.user.role == 'manager' %}
                                         <div class="d-flex flex-column gap-1 mt-2 mb-2">
@@ -158,15 +173,14 @@
                                             {% else %}border-danger{% endif %}">
                                             
                                             <div class="d-flex justify-content-between align-items-center mb-2">
-    <strong>👤 {{ raport.supervizor.get_full_name|default:raport.supervizor.username }}</strong>
-    <div>
-        <span class="badge bg-light text-secondary border me-2">{{ raport.data_raportului|date:"d.m.Y H:i" }}</span>
-        
-        {% if request.user == raport.supervizor or request.user.role == 'superadmin' or request.user.role == 'manager' %}
-            <a href="{% url 'sterge_raport' raport.id %}" class="text-danger text-decoration-none" title="Șterge acest raport" onclick="return confirm('Ești sigur că vrei să ștergi definitiv acest raport?');">🗑️</a>
-        {% endif %}
-    </div>
-</div>
+                                                <strong>👤 {{ raport.supervizor.get_full_name|default:raport.supervizor.username }}</strong>
+                                                <div>
+                                                    <span class="badge bg-light text-secondary border me-2">{{ raport.data_raportului|date:"d.m.Y H:i" }}</span>
+                                                    {% if request.user == raport.supervizor or request.user.role == 'superadmin' or request.user.role == 'manager' %}
+                                                        <a href="{% url 'sterge_raport' raport.id %}" class="text-danger text-decoration-none" title="Șterge acest raport" onclick="return confirm('Ești sigur că vrei să ștergi?');">🗑️</a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
                                             
                                             <span class="badge 
                                                 {% if raport.stare_lucrare == 'in_grafic' %}bg-success
@@ -194,22 +208,38 @@
                                     {% if task.status == 'in_asteptare' %}
                                         <form method="POST" action="{% url 'incepe_task' task.id %}" class="form-gps m-0">
                                             {% csrf_token %}
-                                            <input type="hidden" name="lat" class="input_lat">
-                                            <input type="hidden" name="lng" class="input_lng">
+                                            <input type="hidden" name="lat" class="input_lat" value="{{ task.latitudine_inceput|default:'' }}">
+                                            <input type="hidden" name="lng" class="input_lng" value="{{ task.longitudine_inceput|default:'' }}">
                                             <button type="submit" class="btn btn-warning fw-bold w-100 py-2 shadow-sm text-dark">▶ Începe Task</button>
                                         </form>
                                     {% elif task.status == 'in_lucru' %}
                                         <div class="d-flex gap-2">
                                             <a href="{% url 'pauza_task' task.id %}" class="btn btn-secondary w-50 py-2 fw-bold shadow-sm">⏸ Pauză</a>
-                                            <a href="{% url 'finalizeaza_task' task.id %}" class="btn btn-success w-50 py-2 fw-bold shadow-sm">✔️ Finalizează</a>
+                                            
+                                            <form method="POST" action="{% url 'finalizeaza_task' task.id %}" class="form-gps w-50 m-0">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="lat" class="input_lat" value="{{ task.latitudine_inceput|default:'' }}">
+                                                <input type="hidden" name="lng" class="input_lng" value="{{ task.longitudine_inceput|default:'' }}">
+                                                <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">✔️ Finalizează</button>
+                                            </form>
                                         </div>
                                     {% elif task.status == 'in_pauza' %}
                                         <div class="d-flex gap-2">
                                             <a href="{% url 'relua_task' task.id %}" class="btn btn-primary w-50 py-2 fw-bold shadow-sm">▶ Reia Task</a>
-                                            <a href="{% url 'finalizeaza_task' task.id %}" class="btn btn-success w-50 py-2 fw-bold shadow-sm">✔️ Finalizează</a>
+                                            
+                                            <form method="POST" action="{% url 'finalizeaza_task' task.id %}" class="form-gps w-50 m-0">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="lat" class="input_lat" value="{{ task.latitudine_inceput|default:'' }}">
+                                                <input type="hidden" name="lng" class="input_lng" value="{{ task.longitudine_inceput|default:'' }}">
+                                                <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">✔️ Finalizează</button>
+                                            </form>
                                         </div>
                                     {% endif %}
                                 </div>
+                            {% endif %}
+                            
+                            {% if task.status == 'in_lucru' and not task.latitudine_inceput %}
+                                <div class="tracker-gps-automat" data-task-id="{{ task.id }}"></div>
                             {% endif %}
                         </li>
                     {% empty %}
@@ -244,7 +274,7 @@
                                     {% if task.link_google_maps %}
                                         <div class="mt-2">
                                             <a href="{{ task.link_google_maps }}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 12px; padding: 2px 8px;">
-                                                📍 Vezi locația de pornire
+                                                📍 Vezi locația
                                             </a>
                                         </div>
                                     {% endif %}
@@ -274,15 +304,14 @@
                                                     {% else %}border-danger{% endif %}">
                                                     
                                                     <div class="d-flex justify-content-between align-items-center mb-2">
-    <strong>👤 {{ raport.supervizor.get_full_name|default:raport.supervizor.username }}</strong>
-    <div>
-        <span class="badge bg-light text-secondary border me-2">{{ raport.data_raportului|date:"d.m.Y H:i" }}</span>
-        
-        {% if request.user == raport.supervizor or request.user.role == 'superadmin' or request.user.role == 'manager' %}
-            <a href="{% url 'sterge_raport' raport.id %}" class="text-danger text-decoration-none" title="Șterge acest raport" onclick="return confirm('Ești sigur că vrei să ștergi definitiv acest raport?');">🗑️</a>
-        {% endif %}
-    </div>
-</div>
+                                                        <strong>👤 {{ raport.supervizor.get_full_name|default:raport.supervizor.username }}</strong>
+                                                        <div>
+                                                            <span class="badge bg-light text-secondary border me-2">{{ raport.data_raportului|date:"d.m.Y H:i" }}</span>
+                                                            {% if request.user == raport.supervizor or request.user.role == 'superadmin' or request.user.role == 'manager' %}
+                                                                <a href="{% url 'sterge_raport' raport.id %}" class="text-danger text-decoration-none" title="Șterge acest raport" onclick="return confirm('Ești sigur că vrei să ștergi?');">🗑️</a>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
                                                     
                                                     <span class="badge 
                                                         {% if raport.stare_lucrare == 'in_grafic' %}bg-success
@@ -327,56 +356,133 @@
             let lngInput = form.querySelector('.input_lng');
             let btn = form.querySelector('button[type="submit"]');
 
+            if (latInput.value && latInput.value.trim() !== "") {
+                return; 
+            }
+
             if (!form.dataset.incercari) {
                 form.dataset.incercari = 0;
             }
 
-            if (!latInput.value || !lngInput.value) {
-                event.preventDefault(); 
-                
-                btn.innerHTML = "⏳ Se caută semnalul GPS...";
-                btn.disabled = true;
-                
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            latInput.value = position.coords.latitude;
-                            lngInput.value = position.coords.longitude;
-                            form.submit(); 
-                        },
-                        function(error) {
-                            form.dataset.incercari = parseInt(form.dataset.incercari) + 1;
-                            
-                            if (parseInt(form.dataset.incercari) >= 2) {
-                                alert("⚠️ Locația nu s-a putut prelua. Task-ul va începe fără coordonate GPS.");
-                                form.submit();
-                                return;
-                            }
+            event.preventDefault(); 
+            
+            btn.innerHTML = "⏳ Se caută semnalul GPS...";
+            btn.disabled = true;
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        latInput.value = position.coords.latitude;
+                        lngInput.value = position.coords.longitude;
+                        form.submit(); 
+                    },
+                    function(error) {
+                        form.dataset.incercari = parseInt(form.dataset.incercari) + 1;
+                        
+                        if (parseInt(form.dataset.incercari) >= 2) {
+                            alert("⚠️ Locația nu s-a putut prelua. Task-ul merge mai departe fără locație.");
+                            form.submit();
+                            return;
+                        }
 
-                            let mesaj = "";
-                            if (error.code === 1) {
-                                mesaj = "⛔ PERMISIUNE DE LOCAȚIE BLOCATĂ!\n\n1. Intră în Setările telefonului.\n2. Mergi la Aplicații -> Caută 'Task Manager'.\n3. Permisiuni -> Locație -> Permite.\n4. Apasă din nou pe Start.";
-                            } 
-                            else if (error.code === 2 || error.code === 3) {
-                                mesaj = "📡 SEMNAL GPS SLAB (SUBTERAN / HALĂ)!\n\n1. Verifică dacă funcția 'Locație' (GPS) e pornită în meniul de sus al telefonului.\n2. Apropie-te de un geam sau ieși afară.\n3. Apasă din nou pe Start.";
-                            } 
-                            else {
-                                mesaj = "⚠️ Problemă GPS: " + error.message;
-                            }
-                            
-                            alert(mesaj);
+                        let mesaj = "";
+                        if (error.code === 1) {
+                            mesaj = "⛔ PERMISIUNE DE LOCAȚIE BLOCATĂ!\n\n1. Intră în Setările telefonului.\n2. Mergi la Aplicații -> Caută 'Task Manager'.\n3. Permisiuni -> Locație -> Permite.\n4. Apasă din nou pe buton.";
+                        } 
+                        else if (error.code === 2 || error.code === 3) {
+                            mesaj = "📡 SEMNAL GPS SLAB (SUBTERAN / HALĂ)!\n\n1. Verifică dacă funcția 'Locație' (GPS) e pornită în meniul de sus al telefonului.\n2. Apropie-te de un geam sau ieși afară.\n3. Apasă din nou pe buton.";
+                        } 
+                        else {
+                            mesaj = "⚠️ Problemă GPS: " + error.message;
+                        }
+                        
+                        alert(mesaj);
+                        
+                        if (btn.classList.contains('btn-success')) {
+                            btn.innerHTML = "✔️ Finalizează";
+                        } else {
                             btn.innerHTML = "▶ Începe Task";
-                            btn.disabled = false;
-                        },
-                        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-                    );
-                } else {
-                    // 🔥 AICI ERA GAURA TĂCUTĂ! Acum va urla și aici.
-                    alert("⚠️ EROARE SISTEM: Telefonul respinge total accesul la GPS. Verifică setările generale de locație ale telefonului!");
-                    form.submit();
-                }
+                        }
+                        btn.disabled = false;
+                    },
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                );
+            } else {
+                alert("⚠️ EROARE SISTEM: Telefonul respinge total accesul la GPS. Verifică setările generale de locație ale telefonului!");
+                form.submit();
             }
         }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        function incearcaExtragereSilentioasa() {
+            let elementeTracker = document.querySelectorAll('.tracker-gps-automat');
+            
+            // Dacă nu avem niciun task care să ceară locație, ne oprim ca să nu consumăm baterie
+            if (elementeTracker.length === 0) return;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    
+                    // Dacă am prins o locație validă, o trimitem la server pentru fiecare task incomplet
+                    elementeTracker.forEach(function(tracker) {
+                        let taskId = tracker.getAttribute('data-task-id');
+                        let formData = new FormData();
+                        formData.append('lat', position.coords.latitude);
+                        formData.append('lng', position.coords.longitude);
+                        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                        fetch(`/task/${taskId}/gps_silent/`, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                console.log('📍 Locație salvată automat prin interceptare pentru task-ul ' + taskId);
+                                tracker.remove(); // Scoatem trackerul din pagină, misiunea a fost îndeplinită
+                            }
+                        })
+                        .catch(err => console.log('Eroare conexiune AJAX GPS'));
+                    });
+
+                }, function(error) {
+                    console.log('Sistemul a încercat verificarea, dar telefonul e încă la interior.');
+                }, { enableHighAccuracy: true, timeout: 4000 });
+            }
+        }
+
+        // 1. Declanșăm verificarea când deschide/deblochează aplicația (Visibility Change)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                incearcaExtragereSilentioasa();
+            }
+        });
+
+        // 2. Declanșăm verificarea la orice atingere pe ecran (Click / Touch)
+        // Folosim un mic sistem de protecție ca să nu bombardăm senzorul la fiecare secundă
+        let ultimaVerificare = 0;
+        document.addEventListener('touchstart', function() {
+            let acum = Date.now();
+            if (acum - ultimaVerificare > 30000) { // Maxim o dată la 30 de secunde dacă ecranul e atins
+                ultimaVerificare = acum;
+                incearcaExtragereSilentioasa();
+            }
+        });
+        
+        document.addEventListener('click', function() {
+            let acum = Date.now();
+            if (acum - ultimaVerificare > 30000) {
+                ultimaVerificare = acum;
+                incearcaExtragereSilentioasa();
+            }
+        });
+
+        // 3. O primă rulare automată când se încarcă pagina prima dată
+        incearcaExtragereSilentioasa();
     });
 </script>
 
@@ -389,5 +495,6 @@
         });
     }
 </script>
+
 </body>
 </html>
