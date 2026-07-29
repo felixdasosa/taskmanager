@@ -280,7 +280,9 @@ def istoric_taskuri(request):
     if request.user.role not in ['superadmin', 'manager']:
         return redirect('dashboard')
     
-    angajati = User.objects.filter(role='angajat')
+    angajati = User.objects.filter(
+        role__in=['tehnician', 'sofer', 'gestionar', 'inginer']
+    ).order_by('username')
     
     locatii_excel = cache.get('locatii_salvate_din_excel')
     if not locatii_excel:

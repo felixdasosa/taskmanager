@@ -18,3 +18,16 @@ https://cc210d3d8ceb.sn.mynetname.net {
         reverse_proxy localhost:8000
     }
 }
+https://cc210d3d8ceb.sn.mynetname.net:18443 {
+    encode gzip
+
+    # Copiaza aici exact aceeasi linie tls din aplicatia veche
+        tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
+
+
+    reverse_proxy 127.0.0.1:5080
+
+    log {
+        output file "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/lpr_access.log"
+    }
+}
