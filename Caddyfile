@@ -1,33 +1,42 @@
 {
-    # Oprim redirect-urile automate care încearcă să ia portul 80
-    auto_https disable_redirects
+	auto_https disable_redirects
 }
 
 https://cc210d3d8ceb.sn.mynetname.net {
-    # Certificatele tale (calea ta verificată)
-    tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
+	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
 
-    # Fișiere statice
-    handle_path /static/* {
-        root * "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/staticfiles"
-        file_server
-    }
-    
-    # Proxy Django
-    handle {
-        reverse_proxy localhost:8000
-    }
+	handle_path /static/* {
+		root * "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/staticfiles"
+		file_server
+	}
+
+	handle {
+		reverse_proxy localhost:8000
+	}
 }
+
 https://cc210d3d8ceb.sn.mynetname.net:18443 {
-    encode gzip
+	encode gzip
 
-    # Copiaza aici exact aceeasi linie tls din aplicatia veche
-        tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
+	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
 
+	reverse_proxy 127.0.0.1:5080
 
-    reverse_proxy 127.0.0.1:5080
-
-    log {
-        output file "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/lpr_access.log"
-    }
+	log {
+		output file "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/lpr_access.log"
+	}
 }
+
+https://cc210d3d8ceb.sn.mynetname.net:18444 {
+	encode gzip
+
+	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
+
+	reverse_proxy 127.0.0.1:5050
+
+	log {
+		output file "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/dvr_manager_access.log"
+	}
+}
+
+import "D:/Vice Projects/GIT/LPRaddCLX/Caddyfile"

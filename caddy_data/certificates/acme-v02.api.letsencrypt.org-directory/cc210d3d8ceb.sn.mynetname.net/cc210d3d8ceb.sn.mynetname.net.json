@@ -1,0 +1,19 @@
+{
+	"sans": [
+		"cc210d3d8ceb.sn.mynetname.net"
+	],
+	"issuer_data": {
+		"url": "https://acme-v02.api.letsencrypt.org/acme/cert/0507d8dfc3b50767598006591a95d5187d66",
+		"ca": "https://acme-v02.api.letsencrypt.org/directory",
+		"account": "https://acme-v02.api.letsencrypt.org/acme/acct/3463886646",
+		"renewal_info": {
+			"suggestedWindow": {
+				"start": "2026-08-21T08:12:28Z",
+				"end": "2026-08-23T03:23:18Z"
+			},
+			"_uniqueIdentifier": "uyDKRwv-1-Wc-Y8JKqOMN0WxvNg.BQfY38O1B2dZgAZZGpXVGH1m",
+			"_retryAfter": "2026-06-30T13:13:51.448142+03:00",
+			"_selectedTime": "2026-08-22T22:52:34Z"
+		}
+	}
+}

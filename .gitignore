@@ -1,8 +1,5 @@
 ﻿venv/
-db.sqlite3
-caddy_data/
-caddy.exe
+.venv/
 __pycache__/
 *.pyc
-autosave.json
 .env
