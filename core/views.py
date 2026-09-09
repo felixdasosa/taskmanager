@@ -621,25 +621,57 @@ def vizualizare_audit(request):
     })
 @login_required
 def lista_reminders(request):
-    # Verificăm dacă e manager sau superadmin
-    if not (request.user.role == 'superadmin' or request.user.role == 'manager'):
+    if request.user.role not in ['superadmin', 'manager']:
         return redirect('dashboard')
-        
+
+    reminder_editat = None
+
     if request.method == 'POST':
-        form = ReminderForm(request.POST)
+        reminder_id = request.POST.get('reminder_id')
+
+        if reminder_id:
+            reminder_editat = get_object_or_404(
+                Reminder,
+                id=reminder_id,
+                user=request.user
+            )
+            form = ReminderForm(request.POST, instance=reminder_editat)
+        else:
+            form = ReminderForm(request.POST)
+
         if form.is_valid():
             reminder = form.save(commit=False)
             reminder.user = request.user
             reminder.save()
+
+            if reminder_id:
+                messages.success(request, "Reminderul a fost actualizat cu succes.")
+            else:
+                messages.success(request, "Reminderul a fost adaugat cu succes.")
+
             return redirect('lista_reminders')
     else:
-        form = ReminderForm()
-        
-    reminders = Reminder.objects.filter(user=request.user).order_by('data_reminder')
-    
-    # Am specificat calea 'core/reminders.html' 
-    # Te rog să te asiguri că fișierul este în core/templates/core/reminders.html
-    return render(request, 'core/reminders.html', {'reminders': reminders, 'form': form})
+        reminder_id = request.GET.get('edit')
+
+        if reminder_id:
+            reminder_editat = get_object_or_404(
+                Reminder,
+                id=reminder_id,
+                user=request.user
+            )
+            form = ReminderForm(instance=reminder_editat)
+        else:
+            form = ReminderForm()
+
+    reminders = Reminder.objects.filter(
+        user=request.user
+    ).order_by('data_reminder')
+
+    return render(request, 'core/reminders.html', {
+        'reminders': reminders,
+        'form': form,
+        'reminder_editat': reminder_editat,
+    })
 
 @login_required
 def sterge_reminder(request, reminder_id):

@@ -188,9 +188,17 @@ class ReminderForm(forms.ModelForm):
         widgets = {
             'titlu': forms.TextInput(attrs={'class': 'form-control'}),
             'detalii': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'data_reminder': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'data_reminder': forms.DateTimeInput(
+                attrs={'type': 'datetime-local', 'class': 'form-control'},
+                format='%Y-%m-%dT%H:%M'
+            ),
         }
-    
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['data_reminder'].input_formats = ['%Y-%m-%dT%H:%M']
+
+
 class RaportSupervizorForm(forms.ModelForm):
     class Meta:
         model = RaportSupervizor

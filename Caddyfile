@@ -39,4 +39,36 @@ https://cc210d3d8ceb.sn.mynetname.net:18444 {
 	}
 }
 
-import "D:/Vice Projects/GIT/LPRaddCLX/Caddyfile"
+https://cc210d3d8ceb.sn.mynetname.net:18447 {
+    encode gzip
+
+    	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
+
+
+    reverse_proxy 127.0.0.1:18446
+
+    log {
+        output file "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/camera_health_access.log"
+    }
+}
+
+cc210d3d8ceb.sn.mynetname.net:18445 {
+	encode gzip
+
+	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
+
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy 127.0.0.1:3232
+	}
+
+	handle {
+		root * "D:/Vice Projects/GIT/LPRaddCLX/client/dist"
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output file "D:/Vice Projects/GIT/LPRaddCLX/caddy_access.log"
+	}
+}
