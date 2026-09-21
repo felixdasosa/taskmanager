@@ -3,7 +3,6 @@
 }
 
 https://cc210d3d8ceb.sn.mynetname.net {
-	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
 
 	handle_path /static/* {
 		root * "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/staticfiles"
@@ -18,8 +17,6 @@ https://cc210d3d8ceb.sn.mynetname.net {
 https://cc210d3d8ceb.sn.mynetname.net:18443 {
 	encode gzip
 
-	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
-
 	reverse_proxy 127.0.0.1:5080
 
 	log {
@@ -30,7 +27,6 @@ https://cc210d3d8ceb.sn.mynetname.net:18443 {
 https://cc210d3d8ceb.sn.mynetname.net:18444 {
 	encode gzip
 
-	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
 
 	reverse_proxy 127.0.0.1:5050
 
@@ -42,7 +38,6 @@ https://cc210d3d8ceb.sn.mynetname.net:18444 {
 https://cc210d3d8ceb.sn.mynetname.net:18447 {
     encode gzip
 
-    	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
 
 
     reverse_proxy 127.0.0.1:18446
@@ -55,7 +50,6 @@ https://cc210d3d8ceb.sn.mynetname.net:18447 {
 cc210d3d8ceb.sn.mynetname.net:18445 {
 	encode gzip
 
-	tls "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.crt" "C:/Users/iVMS-Skynet/Desktop/taskmanager/taskmanager/aplicatie_taskuri/caddy_data/certificates/acme-v02.api.letsencrypt.org-directory/cc210d3d8ceb.sn.mynetname.net/cc210d3d8ceb.sn.mynetname.net.key"
 
 	@api path /api /api/*
 	handle @api {

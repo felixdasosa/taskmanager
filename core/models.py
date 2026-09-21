@@ -151,6 +151,8 @@ class Reminder(models.Model):
     detalii = models.TextField()
     data_reminder = models.DateTimeField()
     creat_la = models.DateTimeField(auto_now_add=True)
+    finalizat = models.BooleanField(default=False)
+    data_finalizarii = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.titlu} - {self.user.username}"

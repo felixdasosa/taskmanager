@@ -40,6 +40,8 @@ urlpatterns = [
     # Reminders (Noile rute)
     path('reminders/', views.lista_reminders, name='lista_reminders'),
     path('reminders/sterge/<int:reminder_id>/', views.sterge_reminder, name='sterge_reminder'),
+    path('reminders/finalizeaza/<int:reminder_id>/', views.finalizeaza_reminder, name='finalizeaza_reminder'),
+    path('reminders/reactiveaza/<int:reminder_id>/', views.reactiveaza_reminder, name='reactiveaza_reminder'),
     path('task/<int:task_id>/adauga-raport/', views.adauga_raport_supervizor, name='adauga_raport_supervizor'),
     path('raport/sterge/<int:raport_id>/', views.sterge_raport, name='sterge_raport'),
     path('manifest.json', TemplateView.as_view(template_name='core/manifest.json', content_type='application/json'), name='manifest'),

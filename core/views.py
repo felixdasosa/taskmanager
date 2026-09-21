@@ -625,23 +625,26 @@ def lista_reminders(request):
         return redirect('dashboard')
 
     reminder_editat = None
+    status_lista = request.GET.get('status', 'active')
+    afiseaza_finalizate = status_lista == 'finalizate'
 
     if request.method == 'POST':
         reminder_id = request.POST.get('reminder_id')
 
         if reminder_id:
-            reminder_editat = get_object_or_404(
-                Reminder,
-                id=reminder_id,
-                user=request.user
-            )
+            reminder_editat = get_object_or_404(Reminder, id=reminder_id)
             form = ReminderForm(request.POST, instance=reminder_editat)
         else:
             form = ReminderForm(request.POST)
 
         if form.is_valid():
             reminder = form.save(commit=False)
-            reminder.user = request.user
+
+            # La creare, reminderul apartine utilizatorului curent.
+            # La editare, pastram utilizatorul care l-a creat initial.
+            if not reminder_id:
+                reminder.user = request.user
+
             reminder.save()
 
             if reminder_id:
@@ -654,31 +657,80 @@ def lista_reminders(request):
         reminder_id = request.GET.get('edit')
 
         if reminder_id:
-            reminder_editat = get_object_or_404(
-                Reminder,
-                id=reminder_id,
-                user=request.user
-            )
+            reminder_editat = get_object_or_404(Reminder, id=reminder_id)
             form = ReminderForm(instance=reminder_editat)
         else:
             form = ReminderForm()
 
-    reminders = Reminder.objects.filter(
-        user=request.user
-    ).order_by('data_reminder')
+    # Managerul si superadminul vad TOATE reminderele.
+    baza = Reminder.objects.select_related('user').all()
+
+    if afiseaza_finalizate:
+        reminders = baza.filter(finalizat=True).order_by(
+            '-data_finalizarii',
+            '-data_reminder'
+        )
+    else:
+        reminders = baza.filter(finalizat=False).order_by('data_reminder')
 
     return render(request, 'core/reminders.html', {
         'reminders': reminders,
         'form': form,
         'reminder_editat': reminder_editat,
+        'afiseaza_finalizate': afiseaza_finalizate,
+        'nr_active': baza.filter(finalizat=False).count(),
+        'nr_finalizate': baza.filter(finalizat=True).count(),
     })
+
+
+@login_required
+def finalizeaza_reminder(request, reminder_id):
+    if request.user.role not in ['superadmin', 'manager']:
+        return redirect('dashboard')
+
+    reminder = get_object_or_404(Reminder, id=reminder_id)
+
+    if request.method == 'POST':
+        reminder.finalizat = True
+        reminder.data_finalizarii = timezone.now()
+        reminder.save(update_fields=['finalizat', 'data_finalizarii'])
+        messages.success(
+            request,
+            f"Reminderul '{reminder.titlu}' a fost marcat ca finalizat."
+        )
+
+    return redirect('lista_reminders')
+
+
+@login_required
+def reactiveaza_reminder(request, reminder_id):
+    if request.user.role not in ['superadmin', 'manager']:
+        return redirect('dashboard')
+
+    reminder = get_object_or_404(Reminder, id=reminder_id)
+
+    if request.method == 'POST':
+        reminder.finalizat = False
+        reminder.data_finalizarii = None
+        reminder.save(update_fields=['finalizat', 'data_finalizarii'])
+        messages.success(
+            request,
+            f"Reminderul '{reminder.titlu}' a fost reactivat."
+        )
+
+    return redirect('lista_reminders')
+
 
 @login_required
 def sterge_reminder(request, reminder_id):
-    # Doar autorul poate șterge reminder-ul
-    reminder = get_object_or_404(Reminder, id=reminder_id, user=request.user)
+    if request.user.role not in ['superadmin', 'manager']:
+        return redirect('dashboard')
+
+    reminder = get_object_or_404(Reminder, id=reminder_id)
     reminder.delete()
+    messages.success(request, "Reminderul a fost sters definitiv.")
     return redirect('lista_reminders')
+
 def adauga_raport_supervizor(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     
