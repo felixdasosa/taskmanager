@@ -2,6 +2,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 from . import views
+from . import api_xml
 
 urlpatterns = [
     # Logare / Logout
@@ -47,4 +48,18 @@ urlpatterns = [
     path('manifest.json', TemplateView.as_view(template_name='core/manifest.json', content_type='application/json'), name='manifest'),
     path('sw.js', TemplateView.as_view(template_name='core/sw.js', content_type='application/javascript'), name='sw'),
 path('task/<int:task_id>/gps_silent/', views.actualizeaza_gps_silent, name='actualizeaza_gps_silent'),
+    # --- API XML READ-ONLY / LIVE ---
+    path('api/xml/live/', api_xml.api_live, name='api_xml_live'),
+    path('api/xml/database/', api_xml.api_live, name='api_xml_database'),
+    path('api/xml/users/', api_xml.api_users, name='api_xml_users'),
+    path('api/xml/users/<int:user_id>/', api_xml.api_user_detail, name='api_xml_user_detail'),
+    path('api/xml/tasks/', api_xml.api_tasks, name='api_xml_tasks'),
+    path('api/xml/tasks/<int:task_id>/', api_xml.api_task_detail, name='api_xml_task_detail'),
+    path('api/xml/history/', api_xml.api_history, name='api_xml_history'),
+    path('api/xml/reminders/', api_xml.api_reminders, name='api_xml_reminders'),
+    path('api/xml/reminders/<int:reminder_id>/', api_xml.api_reminder_detail, name='api_xml_reminder_detail'),
+    path('api/xml/messages/', api_xml.api_messages, name='api_xml_messages'),
+    path('api/xml/reports/', api_xml.api_reports, name='api_xml_reports'),
+    path('api/xml/reports/<int:report_id>/', api_xml.api_report_detail, name='api_xml_report_detail'),
+    path('api/xml/audit/', api_xml.api_audit, name='api_xml_audit'),
 ]
